@@ -4,42 +4,59 @@
     <title>Sign Language Recognition</title>
 </head>
 
-<body style="
-    text-align:center;
-    font-family:Arial;
-    background-color:#1e3a8a;  /* blue background */
-    color:white;
-">
+<body style="text-align:center; background:#1e3a8a; color:white; font-family:Arial;">
 
-    <h1>Sign Language Recognition</h1>
+<h1>Sign Language Recognition</h1>
 
-    <!-- NOTE BOX -->
-    <div style="
-        width:70%;
-        margin:10px auto 20px auto;
-        padding:10px;
-        background-color:#2563eb;
-        border:1px solid white;
-        font-size:14px;
-    ">
-        <strong>NOTE:</strong> THIS MODEL IS UNDER DEVELOPMENT AND ONLY RECOGNIZES 
-        A, M, N, S, T FROM THE AMERICAN SIGN LANGUAGE DATASET. 
-        TO ADD MORE SIGNS PLEASE REFER TO README.MD
-    </div>
+<div style="width:70%; margin:auto; background:#2563eb; padding:10px;">
+    <strong>NOTE:</strong> THIS MODEL IS UNDER DEVELOPMENT AND ONLY RECOGNIZES
+    A, M, N, S, T FROM THE AMERICAN SIGN LANGUAGE DATASET.
+    TO ADD MORE SIGNS PLEASE REFER TO README.MD
+</div>
 
-    <button onclick="startCamera()" style="padding:8px 16px;">
-        Start Webcam
-    </button>
+<br>
+<button onclick="startCamera()">Start Webcam</button>
 
-    <div style="margin-top:20px;">
-        <img id="video" width="640" height="480">
-    </div>
+<br><br>
 
-    <script>
-        function startCamera() {
-            document.getElementById("video").src = "/video_feed";
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script>
+let video = document.createElement("video");
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+
+function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play();
+            setInterval(captureFrame, 700);
+        });
+}
+
+function captureFrame() {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    let imageData = canvas.toDataURL("image/jpeg");
+
+    fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageData })
+    })
+    .then(res => res.json())
+    .then(data => {
+        ctx.fillStyle = "orange";
+        ctx.fillRect(0, 0, 300, 40);
+        ctx.fillStyle = "white";
+        ctx.font = "24px Arial";
+        if (data.label !== "blank") {
+            ctx.fillText(`${data.label} ${data.confidence}%`, 10, 30);
         }
-    </script>
+    });
+}
+</script>
 
 </body>
 </html>
