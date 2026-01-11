@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Language Recognition</title>
+</head>
+
+<body style="
+    text-align:center;
+    font-family:Arial;
+    background-color:#1e3a8a;  /* blue background */
+    color:white;
+">
+
+    <h1>Sign Language Recognition</h1>
+
+    <!-- NOTE BOX -->
+    <div style="
+        width:70%;
+        margin:10px auto 20px auto;
+        padding:10px;
+        background-color:#2563eb;
+        border:1px solid white;
+        font-size:14px;
+    ">
+        <strong>NOTE:</strong> THIS MODEL IS UNDER DEVELOPMENT AND ONLY RECOGNIZES 
+        A, M, N, S, T FROM THE AMERICAN SIGN LANGUAGE DATASET. 
+        TO ADD MORE SIGNS PLEASE REFER TO README.MD
+    </div>
+
+    <button onclick="startCamera()" style="padding:8px 16px;">
+        Start Webcam
+    </button>
+
+    <div style="margin-top:20px;">
+        <img id="video" width="640" height="480">
+    </div>
+
+    <script>
+        function startCamera() {
+            document.getElementById("video").src = "/video_feed";
+        }
+    </script>
+
+</body>
+</html>
