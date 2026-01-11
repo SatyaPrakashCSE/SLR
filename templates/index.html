@@ -4,11 +4,11 @@
     <title>Sign Language Recognition</title>
 </head>
 
-<body style="text-align:center; background:#1e3a8a; color:white; font-family:Arial;">
+<body style="text-align:center; font-family:Arial; background:white; color:black;">
 
 <h1>Sign Language Recognition</h1>
 
-<div style="width:70%; margin:auto; background:#2563eb; padding:10px;">
+<div style="width:70%; margin:auto; padding:10px; border:1px solid black;">
     <strong>NOTE:</strong> THIS MODEL IS UNDER DEVELOPMENT AND ONLY RECOGNIZES
     A, M, N, S, T FROM THE AMERICAN SIGN LANGUAGE DATASET.
     TO ADD MORE SIGNS PLEASE REFER TO README.MD
@@ -19,19 +19,35 @@
 
 <br><br>
 
-<canvas id="canvas" width="640" height="480"></canvas>
+<canvas id="canvas" width="640" height="480" style="border:1px solid black;"></canvas>
+
+<!-- PREDICTION TEXT BOX -->
+<div id="predictionBox" style="
+    margin:20px auto;
+    padding:10px;
+    width:300px;
+    border:1px solid black;
+    font-size:20px;
+">
+    Prediction will appear here
+</div>
 
 <script>
 let video = document.createElement("video");
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
+let predictionBox = document.getElementById("predictionBox");
+let intervalId = null;
 
 function startCamera() {
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
             video.srcObject = stream;
             video.play();
-            setInterval(captureFrame, 700);
+
+            if (!intervalId) {
+                intervalId = setInterval(captureFrame, 800);
+            }
         });
 }
 
@@ -47,12 +63,11 @@ function captureFrame() {
     })
     .then(res => res.json())
     .then(data => {
-        ctx.fillStyle = "orange";
-        ctx.fillRect(0, 0, 300, 40);
-        ctx.fillStyle = "white";
-        ctx.font = "24px Arial";
         if (data.label !== "blank") {
-            ctx.fillText(`${data.label} ${data.confidence}%`, 10, 30);
+            predictionBox.innerText =
+                `Predicted Sign: ${data.label} (${data.confidence}%)`;
+        } else {
+            predictionBox.innerText = "No sign detected";
         }
     });
 }
